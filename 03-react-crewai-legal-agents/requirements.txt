@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-dotenv
+crewai
+langchain
+langchain-community
+langchain-openai
+openai
+duckduckgo-search
+wikipedia
+pydantic
