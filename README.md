@@ -29,3 +29,9 @@ CrewAI: It's an open-source framework designed to orchestrate role-playing, coll
 
 ---
 # 4th Project: LangGraph Ollama
+This project shows how to connect to an LLM from Ollama platform. It's a good way to run an llm model on your local machine. The notebook also shows an introduction to LangGraph programming.
+1. Download and run a chat into an LLM model from Ollama
+2. How to create nodes, edges and workflows using LangGraph
+
+---
+# 5th Project: 
