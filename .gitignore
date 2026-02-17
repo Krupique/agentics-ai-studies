@@ -211,5 +211,6 @@ ignore/
 .env
 02-legal-assistent-rag-openai/nvidia_report.pdf
 02-legal-assistent-rag-openai/rag/
-
 02-react-rag-legal-assistent-openai/nvidia_report.pdf
+
+05-rag-langgraph-bidding-assistant/rag
