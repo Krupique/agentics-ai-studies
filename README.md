@@ -35,3 +35,5 @@ This project shows how to connect to an LLM from Ollama platform. It's a good wa
 
 ---
 # 5th Project: 
+
+
