@@ -3,6 +3,7 @@ import time
 import numpy as np
 import warnings
 
+import streamlit as st
 from pydantic import BaseModel
 from langgraph.graph import StateGraph
 from langchain_openai import ChatOpenAI
@@ -22,6 +23,15 @@ torch.classes.__path__ = []
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 ########## Etapa 1 - Streamlit Interface Setting ##########
+st.set_page_config(page_title="Data Science Academy", page_icon=":100:", layout="centered")
+
+st.sidebar.title("Instructions")
+st.sidebar.write("""
+- Type specific questions about the bidding process to get detailed answers.
+- The AI ​​assistant will use the RAG database to generate customized answers.
+- Supplementary documents, contracts, and procedures can be used to improve the RAG system (which in this case must be recreated with each new document).
+- Generative AI makes mistakes. ALWAYS validate the answers.
+""")
 
 
 ########## Etapa 2 - LLM Model and RAG Retrive Process Setting ##########
