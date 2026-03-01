@@ -33,8 +33,37 @@ st.sidebar.write("""
 - Generative AI makes mistakes. ALWAYS validate the answers.
 """)
 
+if st.sidebar.button("Support"):
+    st.sidebar.write("Send an email to: krupck@outlook.com")
+
+st.title("Project - Bidding Process")
+st.title("Re-Ranking, Agentic RAG with LangGraph and LM Studio for Bidding Process Assistant")
 
 ########## Etapa 2 - LLM Model and RAG Retrive Process Setting ##########
+llm = ChatOpenAI(
+    model_name="hermes-3-llama-3.2-3b@q6_k",
+    openai_api_base="http://127.0.0.1:1234/v1",
+    openai_api_key="lm-studio",
+    temperature=0.3,
+    max_tokens=256
+)
+
+# exploratory LLM used to generate diverse candidate answers
+llm_exploratory = ChatOpenAI(
+    model_name="hermes-3-llama-3.2-3b@q6_k",
+    openai_api_base="http://127.0.0.1:1234/v1",
+    openai_api_key="lm-studio",
+    temperature=0.9,
+    max_tokens=256
+)
+
+embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
+
+vector_db = Chroma(
+    persist_directory="rag/chroma_db",
+    embedding_function=embedding_model
+)
+retriever = vector_db.as_retriever()
 
 
 ########## Etapa 3 - Tools for the AI Agent Setting ##########
