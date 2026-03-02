@@ -67,6 +67,12 @@ retriever = vector_db.as_retriever()
 
 
 ########## Etapa 3 - Tools for the AI Agent Setting ##########
+search = DuckDuckGoSearchAPIWrapper(region="en-us", max_results=5)
+web_search_tool = Tool(
+    name="WebSearch",
+    func=search.run,
+    description="Search updated information on internet about public digging"
+)
 
 
 ########## Etapa 4 - AI Agent components Setting ##########
