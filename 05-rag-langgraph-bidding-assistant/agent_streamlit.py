@@ -76,6 +76,14 @@ web_search_tool = Tool(
 
 
 ########## Etapa 4 - AI Agent components Setting ##########
+class AgentState(BaseModel):
+    query: str
+    next_step: str = ""
+    retrieved_info: list = []
+    possible_responses: list = []
+    similarity_scores: list = []
+    ranked_response: str = ""
+    confidence_score: float = 0.0
 
 
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
