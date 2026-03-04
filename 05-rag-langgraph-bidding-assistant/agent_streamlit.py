@@ -95,6 +95,25 @@ def agent_decision_step(state: AgentState) -> AgentState:
         state.next_step = "retrieve"
     return state
 
+def use_web_tool(state: AgentState) -> AgentState:
+    """
+        Directly calls the DuckDuckGo tool and formats the output.
+        Adjust if your DuckDuckGo wrapper version uses a different method (e.g., .run vs. .invoke).
+    """
+    try:
+        result = search.run(state.query) 
+    except Exception as e:
+        result = f"Error to execute the search: {e}"
+    # normalize result to string
+    if isinstance(result, dict):
+        # try common keys
+        out = result.get("text") or result.get("output") or str(result)
+    else:
+        out = str(result)
+    state.ranked_response = out or "No information was obtained through web search."
+    state.confidence_score = 0.5
+    return state
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
