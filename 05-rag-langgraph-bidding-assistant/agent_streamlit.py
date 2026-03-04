@@ -85,6 +85,15 @@ class AgentState(BaseModel):
     ranked_response: str = ""
     confidence_score: float = 0.0
 
+def agent_decision_step(state: AgentState) -> AgentState:
+    q = state.query.lower()
+    if any(p in q for p in ["explain", "summarize", "define", "concept", "general", "what is"]):
+        state.next_step = "generate"
+    elif any(p in q for p in ["search on web", "news", "updated", "recently", "latest informations"]):
+        state.next_step = "use_web"
+    else:
+        state.next_step = "retrieve"
+    return state
 
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
