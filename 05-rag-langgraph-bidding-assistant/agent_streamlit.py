@@ -114,6 +114,14 @@ def use_web_tool(state: AgentState) -> AgentState:
     state.confidence_score = 0.5
     return state
 
+def retrieve_info(state: AgentState) -> AgentState:
+    docs = retriever.invoke(state.query)
+    # normalize: some retrievers return {"documents": [...]}
+    if isinstance(docs, dict) and "documents" in docs:
+        docs = docs["documents"]
+    state.retrieved_info = docs or []
+    return state
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
