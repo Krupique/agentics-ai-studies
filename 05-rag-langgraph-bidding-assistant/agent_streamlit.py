@@ -122,6 +122,26 @@ def retrieve_info(state: AgentState) -> AgentState:
     state.retrieved_info = docs or []
     return state
 
+def generate_multiple_answers(state: AgentState) -> AgentState:
+    # prepare concatenated context
+    docs = state.retrieved_info or []
+    context = "\n\n".join([getattr(d, "page_content", str(d)) for d in docs])
+    max_chars = 4000
+    if len(context) > max_chars:
+        context = context[:max_chars] + "\n\n...[context truncated]..."
+
+    # generate diverse candidates with exploratory LLM
+    responses = []
+    for _ in range(5):
+        try:
+            res = (prompt | llm_exploratory | StrOutputParser()).invoke({"input": state.query, "context": context})
+        except Exception:
+            # fallback to simpler chain if invoke signature differs
+            res = (prompt | llm_exploratory | StrOutputParser()).run({"input": state.query, "context": context})
+        responses.append(res)
+    state.possible_responses = responses
+    return state
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
