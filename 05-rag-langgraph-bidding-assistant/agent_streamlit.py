@@ -142,6 +142,11 @@ def generate_multiple_answers(state: AgentState) -> AgentState:
     state.possible_responses = responses
     return state
 
+def _safe_extract_text(obj):
+    if isinstance(obj, dict):
+        return obj.get("answer") or obj.get("text") or str(obj)
+    return str(obj)
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
