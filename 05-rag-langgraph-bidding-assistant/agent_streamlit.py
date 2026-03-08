@@ -147,6 +147,34 @@ def _safe_extract_text(obj):
         return obj.get("answer") or obj.get("text") or str(obj)
     return str(obj)
 
+def evaluate_similarity(state: AgentState) -> AgentState:
+    retrieved_texts = [getattr(d, "page_content", str(d)) for d in state.retrieved_info] if state.retrieved_info else []
+    responses = state.possible_responses or []
+    response_texts = [_safe_extract_text(r) for r in responses]
+
+    if not retrieved_texts or not response_texts:
+        state.similarity_scores = [0.0] * len(response_texts)
+        return state
+
+    # embed once per unique text
+    retrieved_embeddings = np.array(embedding_model.embed_documents(retrieved_texts))
+    response_embeddings = np.array(embedding_model.embed_documents(response_texts))
+
+    # normalize
+    def norm_rows(x):
+        n = np.linalg.norm(x, axis=1, keepdims=True)
+        n[n == 0] = 1e-10
+        return x / n
+
+    re_norm = norm_rows(retrieved_embeddings)
+    resp_norm = norm_rows(response_embeddings)
+
+    # similarity matrix R x M
+    sim_matrix = resp_norm.dot(re_norm.T)
+    similarities = sim_matrix.mean(axis=1).tolist()
+    state.similarity_scores = similarities
+    return state
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
