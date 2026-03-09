@@ -175,6 +175,21 @@ def evaluate_similarity(state: AgentState) -> AgentState:
     state.similarity_scores = similarities
     return state
 
+def rank_answers(state: AgentState) -> AgentState:
+    responses = state.possible_responses or []
+    scores = state.similarity_scores or [0.0] * len(responses)
+    paired = list(zip(responses, scores))
+    if paired:
+        paired_sorted = sorted(paired, key=lambda x: x[1], reverse=True)
+        best, best_score = paired_sorted[0]
+        best_text = _safe_extract_text(best)
+        state.ranked_response = best_text
+        state.confidence_score = float(best_score)
+    else:
+        state.ranked_response = "Sorry, I didn't find relevant information for this query."
+        state.confidence_score = 0.0
+    return state
+
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
 
 
