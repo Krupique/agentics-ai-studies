@@ -191,6 +191,30 @@ def rank_answers(state: AgentState) -> AgentState:
     return state
 
 ########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
+workflow = StateGraph(AgentState)
+workflow.add_node("decision", agent_decision_step)
+workflow.add_node("retrieve", retrieve_info)
+workflow.add_node("generate_multiple", generate_multiple_answers)
+workflow.add_node("evaluate_similarity", evaluate_similarity)
+workflow.add_node("rank_responses", rank_answers)
+workflow.add_node("use_web", use_web_tool)
+
+workflow.set_entry_point("decision")
+
+workflow.add_conditional_edges(
+    "decision",
+    lambda state: {
+        "retrieve": "retrieve",
+        "generate": "generate_multiple",
+        "use_web": "use_web"
+    }[state.next_step]
+)
+
+workflow.add_edge("retrieve", "generate_multiple")
+workflow.add_edge("generate_multiple", "evaluate_similarity")
+workflow.add_edge("evaluate_similarity", "rank_responses")
+
+agent_workflow = workflow.compile()
 
 
 ########## Etapa 6 - Web App with Streamlit Setting ##########
