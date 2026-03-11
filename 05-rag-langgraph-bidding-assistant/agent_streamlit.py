@@ -22,7 +22,7 @@ warnings.filterwarnings("ignore")
 torch.classes.__path__ = []
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-########## Etapa 1 - Streamlit Interface Setting ##########
+########## Step 1 - Streamlit Interface Setting ##########
 st.set_page_config(page_title="Agent for Bidding Process", page_icon=":100:", layout="centered")
 
 st.sidebar.title("Instructions")
@@ -39,7 +39,7 @@ if st.sidebar.button("Support"):
 st.title("Project - Bidding Process")
 st.title("Re-Ranking, Agentic RAG with LangGraph and LM Studio for Bidding Process Assistant")
 
-########## Etapa 2 - LLM Model and RAG Retrive Process Setting ##########
+########## Step 2 - LLM Model and RAG Retrive Process Setting ##########
 llm = ChatOpenAI(
     model_name="hermes-3-llama-3.2-3b@q6_k",
     openai_api_base="http://127.0.0.1:1234/v1",
@@ -66,7 +66,37 @@ vector_db = Chroma(
 retriever = vector_db.as_retriever()
 
 
-########## Etapa 3 - Tools for the AI Agent Setting ##########
+# Prompt / combine chain
+prompt = PromptTemplate.from_template(
+    """
+        You are a specialist assistant in public procurement.
+        Answer the following question, in English, based on the documents provided:
+
+        {context}
+
+        Question: {input}
+        Remember that for any question that deviates from this topic, you must state that you cannot help with other topics because you specialize in procurement and not other matters.
+    """
+)
+
+combine_docs_chain = (
+    prompt
+    | llm
+    | StrOutputParser()
+)
+
+# qa_chain expects a concatenated context string
+qa_chain = (
+    {
+        "context": RunnablePassthrough(),
+        "input": RunnablePassthrough()
+    }
+    | (prompt | llm | StrOutputParser())
+)
+
+
+
+########## Step 3 - Tools for the AI Agent Setting ##########
 search = DuckDuckGoSearchAPIWrapper(region="en-us", max_results=5)
 web_search_tool = Tool(
     name="WebSearch",
@@ -75,7 +105,7 @@ web_search_tool = Tool(
 )
 
 
-########## Etapa 4 - AI Agent components Setting ##########
+########## Step 4 - AI Agent components Setting ##########
 class AgentState(BaseModel):
     query: str
     next_step: str = ""
@@ -190,7 +220,7 @@ def rank_answers(state: AgentState) -> AgentState:
         state.confidence_score = 0.0
     return state
 
-########## Etapa 5 - LangGraph Agent Execution Flow Setting ##########
+########## Step 5 - LangGraph Agent Execution Flow Setting ##########
 workflow = StateGraph(AgentState)
 workflow.add_node("decision", agent_decision_step)
 workflow.add_node("retrieve", retrieve_info)
@@ -217,11 +247,11 @@ workflow.add_edge("evaluate_similarity", "rank_responses")
 agent_workflow = workflow.compile()
 
 
-########## Etapa 6 - Web App with Streamlit Setting ##########
+########## Step 6 - Web App with Streamlit Setting ##########
 query = st.text_input("Ask me a question:")
 
 if st.button("Send"):
-    with st.spinner("O Sistema de IA Está Processando Sua Consulta. Pratique a Paciência e Aguarde..."):
+    with st.spinner("The AI system is processing your query. Be patient..."):
         output = agent_workflow.invoke(AgentState(query=query))
 
     st.subheader("Response:")
@@ -235,3 +265,9 @@ if st.button("Send"):
     st.markdown(response)
 
     # related_documents = output.get("retrieved_info", [])
+
+    
+
+# Show a watermark on the footer
+APP_WATERMARK = "HENRIQUE-KRUPCK-AGENTIC-LANGGRAPH"
+st.markdown(f"<div style='text-align: center; color: #cccccc; font-size:10px;'>{APP_WATERMARK}</div>", unsafe_allow_html=True)
