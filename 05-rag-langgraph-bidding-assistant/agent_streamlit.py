@@ -218,3 +218,20 @@ agent_workflow = workflow.compile()
 
 
 ########## Etapa 6 - Web App with Streamlit Setting ##########
+query = st.text_input("Ask me a question:")
+
+if st.button("Send"):
+    with st.spinner("O Sistema de IA Está Processando Sua Consulta. Pratique a Paciência e Aguarde..."):
+        output = agent_workflow.invoke(AgentState(query=query))
+
+    st.subheader("Response:")
+
+    response = output.get("ranked_response", output.get("final", "No answers was generated."))
+    confidence = output.get("confidence_score", 0.0)
+
+    if isinstance(response, dict) and "answer" in response:
+        response = response["answer"]
+
+    st.markdown(response)
+
+    # related_documents = output.get("retrieved_info", [])
