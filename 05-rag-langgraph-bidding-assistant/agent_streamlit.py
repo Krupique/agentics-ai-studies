@@ -264,9 +264,24 @@ if st.button("Send"):
 
     st.markdown(response)
 
-    # related_documents = output.get("retrieved_info", [])
+    related_documents = output.get("retrieved_info", [])
 
-    
+    if related_documents:
+        st.subheader("Related Documents:")
+
+        for doc in related_documents:
+            doc_id = getattr(doc, "id", None) or (getattr(doc, "metadata", {}) or {}).get("id", "N/A")
+            source = (getattr(doc, "metadata", {}) or {}).get("source", "Unknown")
+            content = getattr(doc, "page_content", str(doc))
+
+            st.markdown(f"**ID:** `{doc_id}`")
+            st.markdown(f"**Source:** `{source}`")
+            st.text_area("Content", content, height = 80)
+
+    else:
+        st.write("No related documents were found.")
+
+
 
 # Show a watermark on the footer
 APP_WATERMARK = "HENRIQUE-KRUPCK-AGENTIC-LANGGRAPH"
