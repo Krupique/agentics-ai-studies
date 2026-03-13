@@ -35,5 +35,9 @@ This project shows how to connect to an LLM from Ollama platform. It's a good wa
 
 ---
 # 5th Project: 
-
+The goal of this project is combine all the previous concepts into an application using streamlit that is able to use LLM, search in RAG and search in Web. I also created all the workflow using LangGraph.</br>
+1. LLM used is the llama3.2 and it is called as an API via LMStudio;
+2. RAG was created using ChromaDB;
+3. Search tool is called using the DuckDuckGo engine;
+4. The flow was made using LangGraph;
 
