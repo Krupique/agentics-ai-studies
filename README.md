@@ -43,3 +43,8 @@ The goal of this project is combine all the previous concepts into an applicatio
 
 ---
 # 6th Project: 
+To move beyond simple data retrieval by splitting the answering process into isolated, specialized steps—summarization, critical reasoning, and final synthesis—resulting in highly accurate, context-aware answers to complex document queries (like legal contracts or technical papers).</br>
+1. Multi-Agent Orchestration: Decomposes a single complex prompt into a structured 3-node graph workflow (DocumentAgent $\rightarrow$ ReasoningAgent $\rightarrow$ MetaAgent).
+2. Retrieval-Augmented Generation (RAG): Dynamically loads local PDF documents, processes them into dense semantic vectors, and fetches top-k relevant fragments to contextualize the LLM.
+3. Stateful Execution: Utilizes a central AgentState to pass data tokens sequentially through graph edges, ensuring no information is lost between processing layers.
+4. Critical Reasoning Pipeline: Isolates factual data fetching from deep text analysis to eliminate hallucinations and maximize analytical precision.
