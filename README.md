@@ -42,7 +42,7 @@ The goal of this project is combine all the previous concepts into an applicatio
 4. The flow was made using LangGraph;
 
 ---
-# 6th Project: 
+# 6th Project: Multi-Agent RAG Critic
 To move beyond simple data retrieval by splitting the answering process into isolated, specialized steps—summarization, critical reasoning, and final synthesis—resulting in highly accurate, context-aware answers to complex document queries (like legal contracts or technical papers).</br>
 1. Multi-Agent Orchestration: Decomposes a single complex prompt into a structured 3-node graph workflow (DocumentAgent $\rightarrow$ ReasoningAgent $\rightarrow$ MetaAgent).
 2. Retrieval-Augmented Generation (RAG): Dynamically loads local PDF documents, processes them into dense semantic vectors, and fetches top-k relevant fragments to contextualize the LLM.
