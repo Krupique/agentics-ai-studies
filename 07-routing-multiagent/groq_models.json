@@ -1,0 +1,14 @@
+{
+  "factual": {
+    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "prompt": "Answer directly and briefly, in English: {query}"
+  },
+  "research": {
+    "model": "llama-3.3-70b-versatile",
+    "prompt": "Provide a complete and detailed answer, in English, about: {query}"
+  },
+  "general": {
+    "model": "llama-3.1-8b-instant",
+    "prompt": "In general answer, in English: {query}"
+  }
+}
