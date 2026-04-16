@@ -16,6 +16,19 @@ The application of AI Agents is expanding rapidly and will revolutionize the sof
 
 ---
 
+## Large Language Models (LLMs) vs. Small Language Models (SLMs)
+
+Both are categories of AI models focused on natural language processing. The main difference between them lies in the scale of their parameters and processing capacity.
+
+LLMs are large-scale models, trained with billions of parameters and enormous volumes of textual data. They have a high capacity for text generation, understanding complex context, and adapting to diverse tasks without the need for specific additional training. However, their use demands robust infrastructure, significant computational power, and high costs.
+
+On the other hand, SLMs are smaller models, optimized to run with fewer computational resources. Although they have fewer parameters and a reduced capacity to understand and generate complex texts, they are more efficient for specific applications and can be used on local devices such as cell phones and personal computers. This makes them ideal for less demanding tasks, such as lightweight virtual assistants and business applications that need quick and economical responses.
+
+The essential difference between the two lies in the balance between performance and efficiency. While LLMs offer more sophisticated and versatile results, SLMs are more accessible, faster, and better suited for scenarios where resource savings are a priority.
+
+
+---
+
 ## Prompt Engineering - The Secret to Using Generative AI Effectively
 
 Prompt engineering is the practice of formulating clear and specific instructions for Generative AI models, aiming to obtain answers aligned with user expectations. A "prompt" is the textual input provided to the AI, which can range from a simple question to a complex set of guidelines. How you structure these instructions directly impacts the quality of the generated responses.
