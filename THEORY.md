@@ -14,6 +14,21 @@ There are different types of AI Agents including:
 
 The application of AI Agents is expanding rapidly and will revolutionize the software market.
 
+
+### Principles Defining AI Agents
+
+All software autonomously performs different tasks, as determined by the software developer. So what makes AI Agents special?
+
+AI Agents are “rational” agents. They make “rational” decisions based on their perceptions and data to produce results. We simply give them a task, the main guidelines, and the AI ​​Agents find ways to deliver a solution.
+
+Therefore:
+- AI Agents should have maximum autonomy, but always with human supervision;
+- AI Agents use their own intermediate responses to improve the final response;
+- AI Agents can query databases or the web, thus using reliable data sources. Various tools (function calling) can be used;
+- AI Agents appear to have intelligence, but they don't. Everything is still high-speed processing due to the training of models with large volumes of data;
+- AI Agents are based on LLMs, Mathematics, and Statistics.
+
+
 ---
 
 ## Large Language Models (LLMs) vs. Small Language Models (SLMs)
