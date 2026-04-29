@@ -14,6 +14,24 @@ from langsmith import Client as LangSmithClient
 
 ########## Environment Variable Configuration ##########
 
+# Activing the parallelism tokenization
+os.environ['TOKENIZERS_PARALLELISM'] = 'True'
+load_dotenv()
+
+groq_api_key = os.getenv("GROQ_API_KEY")
+if not groq_api_key:
+    logfire.critical("GROQ_API_KEY was not defined in the environment or .env!") # Using logfire
+
+langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
+langchain_api_key_env = os.getenv("LANGCHAIN_API_KEY")
+LOGFIRE_API_KEY = os.getenv("LOGFIRE_API_KEY")
+
+try:
+    logfire.configure() 
+    print("Log - Logfire setted.") 
+except Exception as e:
+     print(f"Log - Warning: Failed to configure Logfire automatically.: {e}")
+
 ########## Auxiliary Functions ##########
 
 ########## Functions for Graph Nodes in LangGraph ##########
