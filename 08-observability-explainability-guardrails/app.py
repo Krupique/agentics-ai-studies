@@ -32,6 +32,25 @@ try:
 except Exception as e:
      print(f"Log - Warning: Failed to configure Logfire automatically.: {e}")
 
+
+
+if not langsmith_api_key or not langchain_api_key_env:
+    print("LANGSMITH_API_KEY and/or LANGCHAIN_API_KEY aren't defineds. LangSmith tracing may not working correctly.")
+
+if not LOGFIRE_API_KEY:
+    print("LOGFIRE_API_KEY not defined. Logs to Pydantic LogFire Cloud will not work (unless another OTEL exporter is configured).")
+
+# Checking LANGCHAIN_TRACING_V2
+if os.getenv("LANGCHAIN_TRACING_V2", "false").lower() != "true":
+    print("The LANGCHAIN_TRACING_V2 environment variable is not set to 'true'. Automatic tracing from LangGraph to LangSmith MAY be disabled.")
+
+# Checking LANGCHAIN_API_KEY specifically for tracing
+if not langchain_api_key_env:
+     print("The LANGCHAIN_API_KEY environment variable is not set. LangGraph tracing for LangSmith will NOT work.")
+
+# RAG path
+VECTORSTORE_PATH = "faiss_index"
+
 ########## Auxiliary Functions ##########
 
 ########## Functions for Graph Nodes in LangGraph ##########
