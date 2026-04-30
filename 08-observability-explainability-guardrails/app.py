@@ -52,6 +52,21 @@ if not langchain_api_key_env:
 VECTORSTORE_PATH = "faiss_index"
 
 ########## Auxiliary Functions ##########
+@st.cache_resource
+def load_llm_final_answer():
+    print("LOG - Loading LLM Groq...")
+    
+    try:
+        llm = ChatGroq(api_key = groq_api_key, model = "openai/gpt-oss-120b", temperature = 0.1) 
+        
+        logfire.info("LLM Groq (resposta final) carregado com sucesso.")
+        
+        return llm
+    
+    except Exception as e:
+        logfire.error("Error Loading final LLM", error = str(e), exc_info = True)
+        
+
 
 ########## Functions for Graph Nodes in LangGraph ##########
 
