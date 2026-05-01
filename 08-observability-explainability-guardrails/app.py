@@ -66,7 +66,34 @@ def load_llm_final_answer():
     except Exception as e:
         logfire.error("Error Loading final LLM", error = str(e), exc_info = True)
         
-
+        
+@st.cache_resource
+def load_retriever():
+    print("LOG - Loading Retriever RAG...")
+    
+    if not os.path.exists(VECTORSTORE_PATH):
+        logfire.error("FAISS index was not found", path = VECTORSTORE_PATH)
+        
+        print(f"FAISS was not found at '{VECTORSTORE_PATH}'. Run 'setup_rag.py'.")
+    try:
+        model_name = "BAAI/bge-base-en"
+        encode_kwargs = {'normalize_embeddings': True} 
+        embedding_model = HuggingFaceEmbeddings(
+            model_name = model_name, 
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs = encode_kwargs
+        )
+        
+        vector_store = FAISS.load_local(VECTORSTORE_PATH, embedding_model, allow_dangerous_deserialization = True)
+        retriever = vector_store.as_retriever(search_kwargs = {'k': 5})
+        
+        logfire.info("Retriever RAG loaded sucessfully.", path = VECTORSTORE_PATH)
+        
+        return retriever
+    
+    except Exception as e:
+        logfire.error("Error loading Retriever RAG", path = VECTORSTORE_PATH, error = str(e), exc_info = True) 
+        print(f"Erro loading Retriever RAG: {e}")
 
 ########## Functions for Graph Nodes in LangGraph ##########
 
