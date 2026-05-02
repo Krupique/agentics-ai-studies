@@ -66,7 +66,7 @@ def load_llm_final_answer():
     except Exception as e:
         logfire.error("Error Loading final LLM", error = str(e), exc_info = True)
         
-        
+
 @st.cache_resource
 def load_retriever():
     print("LOG - Loading Retriever RAG...")
@@ -95,6 +95,13 @@ def load_retriever():
         logfire.error("Error loading Retriever RAG", path = VECTORSTORE_PATH, error = str(e), exc_info = True) 
         print(f"Erro loading Retriever RAG: {e}")
 
+
+class GraphState(TypedDict):
+    query: str
+    source_decision: Literal["RAG", "WEB", ""]
+    rag_context: str | None
+    web_results: str | None
+    final_answer: str | None
 ########## Functions for Graph Nodes in LangGraph ##########
 
 ########## Function to Compile the Graph and Define Routing Rules ##########
