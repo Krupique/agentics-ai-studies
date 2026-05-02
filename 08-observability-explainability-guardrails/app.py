@@ -96,13 +96,75 @@ def load_retriever():
         print(f"Erro loading Retriever RAG: {e}")
 
 
+########## Functions for Graph Nodes in LangGraph ##########
 class GraphState(TypedDict):
     query: str
     source_decision: Literal["RAG", "WEB", ""]
     rag_context: str | None
     web_results: str | None
     final_answer: str | None
-########## Functions for Graph Nodes in LangGraph ##########
+
+
+def route_query_node(state: GraphState) -> dict:
+    """
+    Analyst searchs and decides the source (RAG or WEB).
+    Update 'source_decision' in state.
+    """
+
+    # Extracts the query from state
+    query = state["query"]
+
+    # Logfire span to grouping nodes logs
+    span = logfire.span("Running node: Query routing", query = query)
+    
+    # Inside the Span
+    with span:
+
+        # **REFINE PROMPT WITH EXAMPLES (FEW-SHOT)**
+        prompt = f"""Your task is to classify a user's query to direct it to the best source of information. The sources are:
+            1. **RAG**: Internal knowledge base with technical support documents, specific procedures, our system settings, internal guides. Use RAG for questions about 'how to do X in our system', 'what is the configuration for Y', 'internal documentation on Z'.
+            2. **WEB**: General internet search for information about third-party software (e.g., Anaconda, Python, Excel), technology news, generic errors not documented internally, very recent information, or anything that is not specific to our internal documents.
+
+            Examples:
+            - Query: "How do I configure the internal email server?" -> Answer: RAG
+            - Query: "What is the latest version of Streamlit?" -> Answer: WEB
+            - Query: "What is the procedure to reset the ABC system password?" -> Answer: RAG
+            - Query: "How do I install the Python interpreter on Windows 11?" -> Answer: WEB
+            - Query: "how to install Anaconda Python" -> Response: WEB
+
+            Now, classify the following query:
+            User Query: '{query}'
+            Based on the query, which is the most appropriate source? Answer ONLY with the word 'RAG' or the word 'WEB'."""
+
+        
+        try:
+
+            # **CREATING A DEDICATED LLM FOR ROUTING**
+            router_llm = ChatGroq(api_key = groq_api_key,
+                                  model = "openai/gpt-oss-120b",
+                                  temperature = 0.0)
+
+            response = router_llm.invoke(prompt)
+            raw_decision = response.content
+
+            decision = raw_decision.strip().upper().replace("'", "").replace('"', '')
+
+            if decision == "RAG":
+                final_decision = "RAG"
+            elif decision == "WEB":
+                 final_decision = "WEB"
+            else:
+                logfire.warn("Unexpected decision by the router, using the web as a fallback.", raw_decision = raw_decision, query = query, decision_parsed = decision)
+                final_decision = "WEB"
+
+            logfire.info("Routing decision finalized.", raw_decision = raw_decision, final_decision = final_decision)
+
+            return {"source_decision": final_decision}
+
+        except Exception as e:
+            logfire.error("Error in the routing node, using WEB as fallback..", query = query, error = str(e), exc_info = True)
+            return {"source_decision": "WEB"}
+
 
 ########## Function to Compile the Graph and Define Routing Rules ##########
 
