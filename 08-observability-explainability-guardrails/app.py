@@ -105,6 +105,7 @@ class GraphState(TypedDict):
     final_answer: str | None
 
 
+@traceable(run_type = "llm", name = "Node_RouteQuery") # LangSmith Decorator
 def route_query_node(state: GraphState) -> dict:
     """
     Analyst searchs and decides the source (RAG or WEB).
@@ -164,6 +165,32 @@ def route_query_node(state: GraphState) -> dict:
         except Exception as e:
             logfire.error("Error in the routing node, using WEB as fallback..", query = query, error = str(e), exc_info = True)
             return {"source_decision": "WEB"}
+
+
+@traceable(run_type = "retriever", name = "Node_RetrieveRAG") # LangSmith Decorator
+def retrieve_rag_node(state: GraphState) -> dict:
+    query = state["query"]
+    
+    span = logfire.span("Running node: Retrieve RAG", query = query)
+    with span:
+        try:
+            local_retriever = load_retriever()
+            results = local_retriever.invoke(query)
+            
+            # Concatenating the content of each returned document into a single context string.
+            context = "\n\n".join([doc.page_content for doc in results])
+            
+            if not context:
+                logfire.info("No RAG context found.")
+                return {"rag_context": "No relevant internal documents were found."}
+            
+            else:
+                logfire.info("RAG context was found.", context_length = len(context))
+                return {"rag_context": context}
+        
+        except Exception as e:
+            logfire.error("Error in RAG node", query = query, error = str(e), exc_info = True)
+            return {"rag_context": f"Error searching internal documents.: {e}"}
 
 
 ########## Function to Compile the Graph and Define Routing Rules ##########
