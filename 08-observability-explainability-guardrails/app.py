@@ -193,6 +193,28 @@ def retrieve_rag_node(state: GraphState) -> dict:
             return {"rag_context": f"Error searching internal documents.: {e}"}
 
 
+@traceable(run_type = "tool", name = "Node_SearchWeb") # LangSmith Decorator
+def search_web_node(state: GraphState) -> dict:
+    query = state["query"]
+    span = logfire.span("Executando Nó: Search Web", query = query)
+    
+    with span:
+        try:
+            web_search_tool = DuckDuckGoSearchRun()
+            results = web_search_tool.run(query)
+
+            if not results:
+                logfire.info("No results were found in the web search.")
+                return {"web_results": "No results were found in the web search."}
+            
+            else:
+                logfire.info("Web search results found.", results_length = len(results))
+                return {"web_results": results}
+        
+        except Exception as e:
+            logfire.error("Error in Web Search node", query = query, error = str(e), exc_info = True)
+            return {"web_results": f"Error while performing a web search.: {e}"}
+
 ########## Function to Compile the Graph and Define Routing Rules ##########
 
 ########## Streamlit Configuration ##########
