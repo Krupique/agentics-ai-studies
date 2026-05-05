@@ -215,6 +215,64 @@ def search_web_node(state: GraphState) -> dict:
             logfire.error("Error in Web Search node", query = query, error = str(e), exc_info = True)
             return {"web_results": f"Error while performing a web search.: {e}"}
 
+
+def generate_answer_node(state: GraphState) -> dict:
+    query = state["query"]
+    span = logfire.span("Executando Nó: Geração da Resposta", query = query)
+    
+    with span:
+        rag_context = state.get("rag_context")
+        web_results = state.get("web_results")
+        context_provided = ""
+        source_used = "None"
+
+        rag_useful = rag_context != "No relevant internal documents were found."
+        web_useful = web_results != "No results were found in the web search."
+
+        if rag_useful:
+            context_provided = f"Context of internal documents:\n{rag_context}"
+            source_used = "RAG"
+            logfire.info("Using RAG context to generate a response.")
+        elif web_useful:
+            context_provided = f"Web search results:\n{web_results}"
+            source_used = "WEB"
+            logfire.info("Using web results to generate a response.")
+        else:
+            context_provided = "No additional information was found in the available sources."
+            logfire.info("No useful context found to generate a response.")
+
+        logfire.info('Source(s) for generation', source_used = source_used, rag_context_present = rag_useful, web_results_present = web_useful)
+
+        prompt = f"""You are a helpful and concise technical support assistant. Answer the user's question clearly, using ONLY the information provided in the context below. 
+        If the context is not helpful or relevant to the question, state that you did not find specific information about it in the available sources. DO NOT invent answers.
+
+        User query: {query}
+
+        Provided context: {context_provided}
+
+        Concise answer:"""
+
+        # Execution block
+        try:
+
+            # Runing the function
+            llm_resposta_final = load_llm_final_answer()
+            
+            # Running the LLM
+            response = llm_resposta_final.invoke(prompt)
+
+            # Extract answer contents
+            final_answer = response.content
+
+            # LogFire
+            logfire.info("Generated final answer", source_used = source_used, answer_length = len(final_answer))
+            
+            return {"final_answer": final_answer}
+       
+        except Exception as e:
+            logfire.error("Error in the response generation node.", query = query, source_used = source_used, error = str(e), exc_info = True)
+            return {"final_answer": f"Sorry, a technical error occurred while trying to generate the final response.: {e}"}
+
 ########## Function to Compile the Graph and Define Routing Rules ##########
 
 ########## Streamlit Configuration ##########
