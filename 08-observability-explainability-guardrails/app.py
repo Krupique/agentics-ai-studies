@@ -216,6 +216,7 @@ def search_web_node(state: GraphState) -> dict:
             return {"web_results": f"Error while performing a web search.: {e}"}
 
 
+@traceable(run_type = "llm", name = "Node_GenerateAnswer") # LangSmith Decorator
 def generate_answer_node(state: GraphState) -> dict:
     query = state["query"]
     span = logfire.span("Executando Nó: Geração da Resposta", query = query)
