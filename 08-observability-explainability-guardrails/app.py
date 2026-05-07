@@ -274,6 +274,15 @@ def generate_answer_node(state: GraphState) -> dict:
             logfire.error("Error in the response generation node.", query = query, source_used = source_used, error = str(e), exc_info = True)
             return {"final_answer": f"Sorry, a technical error occurred while trying to generate the final response.: {e}"}
 
+
+def decide_source_edge(state: GraphState) -> Literal["retrieve_rag_node", "search_web_node"]:
+    decision = state["source_decision"]
+    logfire.debug("Conditional edge: Deciding next node", current_decision = decision) # LogFire debug level
+
+    if decision == "RAG":
+        return "retrieve_rag_node"
+    else: # Including "WEB" and any fallback
+        return "search_web_node"
 ########## Function to Compile the Graph and Define Routing Rules ##########
 
 ########## Streamlit Configuration ##########
