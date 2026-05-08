@@ -283,6 +283,48 @@ def decide_source_edge(state: GraphState) -> Literal["retrieve_rag_node", "searc
         return "retrieve_rag_node"
     else: # Including "WEB" and any fallback
         return "search_web_node"
+    
+
 ########## Function to Compile the Graph and Define Routing Rules ##########
+@st.cache_resource
+def compile_graph():
+    span = logfire.span("Compiling LangGraph graph")
+    
+    with span:
+        print("LOG - Compiling LangGraph graph...")
+        
+        try:
+            
+            # Setting the nodes
+            graph_builder = StateGraph(GraphState)
+            graph_builder.add_node("route_query_node", route_query_node)
+            graph_builder.add_node("retrieve_rag_node", retrieve_rag_node)
+            graph_builder.add_node("search_web_node", search_web_node)
+            graph_builder.add_node("generate_answer_node", generate_answer_node)
+            graph_builder.set_entry_point("route_query_node")
+
+            # Defining the condition for routing
+            graph_builder.add_conditional_edges("route_query_node", decide_source_edge, {
+                "retrieve_rag_node": "retrieve_rag_node",
+                "search_web_node": "search_web_node",
+            })
+
+            # Adding sequential edges
+            graph_builder.add_edge("retrieve_rag_node", "generate_answer_node")
+            graph_builder.add_edge("search_web_node", "generate_answer_node")
+            graph_builder.add_edge("generate_answer_node", END)
+
+            # Compling the graph
+            app = graph_builder.compile()
+            print("LOG - Graph compiled successfully.!")
+            logfire.info("Graph compiled successfully.")
+            return app
+        
+        except Exception as e:
+            
+            print(f"LOG - Serious error compiling the graph.: {e}")
+            logfire.critical("Error compiling the graph", error = str(e), exc_info = True)
+            raise e
+
 
 ########## Streamlit Configuration ##########
