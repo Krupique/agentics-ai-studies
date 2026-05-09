@@ -328,3 +328,17 @@ def compile_graph():
 
 
 ########## Streamlit Configuration ##########
+st.title("🤖 Technical Support Assistant") 
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role": "assistant", "content": "Hi! How can I help you as your technical assistant today?"}]
+
+# Messages history
+for message in st.session_state.messages:
+    
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        
+        if message["role"] == "assistant" and "source" in message:
+            
+            st.caption(f"Searched source: {message['source']}")
