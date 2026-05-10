@@ -342,3 +342,9 @@ for message in st.session_state.messages:
         if message["role"] == "assistant" and "source" in message:
             
             st.caption(f"Searched source: {message['source']}")
+
+
+llm_final = load_llm_final_answer()
+retriever_rag = load_retriever()
+compiled_app = compile_graph()
+
