@@ -356,16 +356,15 @@ if user_query := st.chat_input("Your question about technical support..."):
     # Opens the span context to group the query processing operations
     with span_chat:
 
-# Registers in LogFire that a new query was received via chat_input
-logfire.info("New query received from chat input.")
+        # Registers in LogFire that a new query was received via chat_input
+        logfire.info("New query received from chat input.")
 
-# Adds the user's message to the chat history in the session and displays it
-st.session_state.messages.append({"role": "user", "content": user_query})
+        # Adds the user's message to the chat history in the session and displays it
+        st.session_state.messages.append({"role": "user", "content": user_query})
 
-# Displays the user's message in the chat with the "user" role
-
-with st.chat_message("user"):
-st.markdown(user_query)
+        # Displays the user's message in the chat with the "user" role
+        with st.chat_message("user"):
+        st.markdown(user_query)
 
 # Starts the block to display the assistant's response in the chat
 
