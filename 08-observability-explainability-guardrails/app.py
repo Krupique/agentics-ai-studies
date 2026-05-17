@@ -364,15 +364,13 @@ if user_query := st.chat_input("Your question about technical support..."):
 
         # Displays the user's message in the chat with the "user" role
         with st.chat_message("user"):
-        st.markdown(user_query)
+            st.markdown(user_query)
 
-# Starts the block to display the assistant's response in the chat
+        # Starts the block to display the assistant's response in the chat
+        with st.chat_message("assistant"):
 
-with st.chat_message("assistant"):
-
-# Uses st.status to provide detailed loading feedback
-
-with st.status("Thinking... 🧠", expanded = False) as status:
+            # Uses st.status to provide detailed loading feedback
+            with st.status("Thinking... 🧠", expanded = False) as status:
 
 # Starts the try block to catch errors in the agent's processing
 
