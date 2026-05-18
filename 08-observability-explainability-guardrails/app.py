@@ -372,32 +372,28 @@ if user_query := st.chat_input("Your question about technical support..."):
             # Uses st.status to provide detailed loading feedback
             with st.status("Thinking... 🧠", expanded = False) as status:
 
-# Starts the try block to catch errors in the agent's processing
+                # Starts the try block to catch errors in the agent's processing
+                try:
+                    # Displays text indicating the analysis of the question and the decision about the source
+                    st.write("Analyzing your question and deciding on the best source...")
 
-try:
+                    # Prepares the input dictionary to invoke the agent graph
+                    inputs = {"query": user_query}
 
-# Displays text indicating the analysis of the question and the decision about the source
+                    # Executes the compiled LangGraph with the provided inputs
+                    final_state = compiled_app.invoke(inputs)
 
-st.write("Analyzing your question and deciding on the best source...")
+                    # Updates the status indicating which source is being consulted
+                    st.write(f"Consulting {final_state.get('source_decision', 'source unkonw')}...") # Updates the status
 
-# Prepares the input dictionary to invoke the agent graph
+                    # Extracts the final answer from the state returned by the graph
+                    final_answer = final_state.get("final_answer", "Unable to generate an answer.")
 
-inputs = {"query": user_query}
+                    # Extracts the decision from the source used
+                    source = final_state.get('source_decision', 'N/A')
 
-# Executes the compiled LangGraph with the provided inputs
-final_state = compiled_app.invoke(inputs)
-
-# Updates the status indicating which source is being consulted
-st.write(f"Consulting {final_state.get('source_decision', 'source') # Updates the status
-
-# Extracts the final answer from the state returned by the graph
-final_answer = final_state.get("final_answer", "Unable to generate an answer.")
-
-# Extracts the decision from the source used
-source = final_state.get('source_decision', 'N/A')
-
-# Updates the status to complete, indicating that the answer is ready
-status.update(label = "Answer ready!", state = "complete", expanded = False) # Updates status to complete
+                    # Updates the status to complete, indicating that the answer is ready
+                    status.update(label = "Answer ready!", state = "complete", expanded = False) # Updates status to complete
 
 # In case of an error in invoking the graph, catches the exception
 except Exception as e:
