@@ -23,7 +23,7 @@ torch.classes.__path__ = []
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 ########## Etapa 1 - Streamlit Interface Setting ##########
-st.set_page_config(page_title="Data Science Academy", page_icon=":100:", layout="centered")
+st.set_page_config(page_title="Agent for Bidding Process", page_icon=":100:", layout="centered")
 
 st.sidebar.title("Instructions")
 st.sidebar.write("""
