@@ -110,3 +110,6 @@ For deep or niche topics, you first ask the AI to generate relevant facts or bac
 * Tell it what TO do, not just what NOT to do: Negative constraints (e.g., "Don't make it boring") are harder for LLMs to process than positive actions (e.g., "Write it in an engaging, conversational tone").
 
 ---
+
+
+##### Where I stoped: **Principles Defining AI Agents**
