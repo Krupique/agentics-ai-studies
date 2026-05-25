@@ -424,19 +424,13 @@ if user_query := st.chat_input("Your question about technical support..."):
             })
 
 # Instructions can go to an expander or modal instead of the sidebar for a cleaner look
-with st.expander("ℹ️ Instructions and Notes):
-
-st.write("""
-
-- Ask specific questions about your technical query.
-
-- The system will automatically decide the best source (internal documents or web).
-
-- Generative AI can make mistakes. ALWAYS validate critical information.
-
-- Logs and Traces are sent to **Pydantic LogFire** and **LangSmith**.
-
-""")
+with st.expander("ℹ️ Instructions and Notes"):
+    st.write("""
+        - Ask specific questions about your technical query.
+        - The system will automatically decide the best source (internal documents or web).
+        - Generative AI can make mistakes. ALWAYS validate critical information.
+        - Logs and Traces are sent to **Pydantic LogFire** and **LangSmith**.
+    """)
 
 if st.button("DSA Support"):
 
