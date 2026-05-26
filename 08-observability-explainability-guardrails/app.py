@@ -432,6 +432,6 @@ with st.expander("ℹ️ Instructions and Notes"):
         - Logs and Traces are sent to **Pydantic LogFire** and **LangSmith**.
     """)
 
-if st.button("DSA Support"):
+    if st.button("Support"):
 
-st.write("Questions? Send an email to: suporte@datascienceacademy.com.br")
+    st.write("Questions? Send an email to: suporte@datascienceacademy.com.br")
