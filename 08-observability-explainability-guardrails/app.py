@@ -433,5 +433,4 @@ with st.expander("ℹ️ Instructions and Notes"):
     """)
 
     if st.button("Support"):
-
-    st.write("Questions? Send an email to: suporte@datascienceacademy.com.br")
+        st.write("Questions? Send an email to: krupck@outlook.com")
