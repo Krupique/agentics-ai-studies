@@ -214,3 +214,4 @@ ignore/
 02-react-rag-legal-assistent-openai/nvidia_report.pdf
 
 05-rag-langgraph-bidding-assistant/rag
+08-observability-explainability-guardrails/.env
