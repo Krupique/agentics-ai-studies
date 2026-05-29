@@ -5,3 +5,4 @@
 * I'm getting a blue screen of death, what should I do?
 * CoPilot is returning incorrect answers, what should I do?
 * I'm trying to install Visual Studio. What's the latest version?
+* I don't remember my Windows system password, what should I do?
