@@ -55,3 +55,5 @@ To move beyond simple data retrieval by splitting the answering process into iso
 ---
 # 8th Project: AI Multi-Agents, RAG, Routing, Guardrails, Observability and Explainability with LangGraph, LangSmith, and Pydantic LogFire
 
+---
+# 9th Project: Memory and Context Management AI Multi-Agent System with LangGraph For CRM Automation and Database Querying
