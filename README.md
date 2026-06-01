@@ -52,3 +52,6 @@ To move beyond simple data retrieval by splitting the answering process into iso
 ---
 # 7th Project: Routing Multiagent
 
+---
+# 8th Project: AI Multi-Agents, RAG, Routing, Guardrails, Observability and Explainability with LangGraph, LangSmith, and Pydantic LogFire
+
