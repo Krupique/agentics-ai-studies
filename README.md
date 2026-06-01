@@ -48,3 +48,7 @@ To move beyond simple data retrieval by splitting the answering process into iso
 2. Retrieval-Augmented Generation (RAG): Dynamically loads local PDF documents, processes them into dense semantic vectors, and fetches top-k relevant fragments to contextualize the LLM.
 3. Stateful Execution: Utilizes a central AgentState to pass data tokens sequentially through graph edges, ensuring no information is lost between processing layers.
 4. Critical Reasoning Pipeline: Isolates factual data fetching from deep text analysis to eliminate hallucinations and maximize analytical precision.
+
+---
+# 7th Project: Routing Multiagent
+
