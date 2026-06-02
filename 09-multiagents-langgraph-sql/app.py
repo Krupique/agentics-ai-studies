@@ -272,3 +272,31 @@ def compile_graph():
 
     print("Graph compiled successfully!")
     return app
+
+
+##### Interface with Streamlit #####
+if "app" not in st.session_state:
+    if not os.path.exists(DB_FILE):
+        st.error(f"Error: The database file '{DB_FILE}' was not found.")
+        st.info("Please run the 'create_crm_db.py' script in the same directory to create the database, and then reload this page.")
+        st.stop()
+
+    st.write("Initializing the graph for the first time...")
+
+    try:
+        st.session_state.app = compile_graph()
+
+        st.session_state.thread_id = "streamlit_thread_crm"
+        
+        # If the chat history does not exist in the session, it initializes with a welcome message.
+        st.session_state.chat_history = [AIMessage(content="Hello! I'm your CRM assistant. Ask me about clients or interactions (e.g., 'Which clients are active?', 'Show oão Smith's interactions').")]
+        
+        # Displays a success message after initializing the graph.
+        st.success("CRM graph initialized.")
+
+    except Exception as e:
+        # In case of a critical error in the graph construction, display an error message and the exception.
+        st.error(f"Critical error when building the CRM graph.: {e}")
+        st.exception(e)
+
+        st.stop()
