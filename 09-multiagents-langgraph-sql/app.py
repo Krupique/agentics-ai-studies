@@ -117,3 +117,36 @@ def create_runnable_agent(llm, system_prompt):
     )
     agent_runnable = prompt | llm.bind_tools(tools)
     return agent_runnable
+
+
+# Defines the function of the Groq agent node responsible for interacting with the CRM.
+def groq_agent_node(state: AgentState):
+    print("\n *** Running the Groq Node (CRM) *** \n")
+    try:
+        # Initializes the LLM Groq with the model, temperature, and API key.
+        llm_groq = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0.2, groq_api_key=groq_api_key) 
+        
+        # Sets the system prompt with instructions for using the CRM tool
+        system_prompt = """You are a CRM assistant named Groq (model Llama3).
+            Your main function is to answer questions about clients and interactions by querying the CRM database.
+            Use the 'query_crm_database' tool by providing a valid SQL SELECT query to retrieve the requested information.
+            See the tool description for the database schema (tables: tb_clients, tb_interactions and their columns).
+            Be direct and base your answers on the data returned by the tool. If the tool returns an error, inform the user.
+            Do not invent information if it is not in the database.
+        """
+        
+        agent_runnable = create_runnable_agent(llm_groq, system_prompt)
+        print("Runnable Groq (CRM) created. Invoking...")
+        response = agent_runnable.invoke({"messages": state['messages']})
+        print(f"Node Groq (CRM) Retrieved Response: Type = {type(response)}, Content = '{response.content[:50]}...'")
+        
+        if hasattr(response, 'tool_calls') and response.tool_calls:
+            print(f"Node Groq (CRM) is calling the tool: {response.tool_calls}")
+        
+        return {"messages": [response]}
+
+    except Exception as e:
+        print(f"!!! Groq Node Error (CRM): {e} !!!")
+        print(f"An error occurred while conecting the Groq API: {e}")
+        error_msg = AIMessage(content = f"[GROQ INTERNAL ERROR]: It was not possible to process with Groq. Detail: {e}", name = "ErrorGroq")
+        return {"messages": [error_msg]}
