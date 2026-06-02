@@ -424,3 +424,65 @@ with container_chat:
             # If it's a message from the User, it displays the text directly.
             else:
                 print(msg.content)
+
+
+if prompt := st.chat_input("Ask a question about CRM..."):    
+    st.session_state.chat_history.append(HumanMessage(content=prompt))
+    st.rerun()
+
+if st.session_state.chat_history and isinstance(st.session_state.chat_history[-1], HumanMessage):
+    last_human_message = st.session_state.chat_history[-1]
+    
+    if not st.session_state.get("processing_lock", False):
+        st.session_state["processing_lock"] = True
+        current_state = {"messages": st.session_state.chat_history}
+        with st.spinner("CRM quering and thinking..."):            
+            final_state = None
+            try:
+                final_state = st.session_state.app.invoke(current_state)
+                
+                if final_state and "messages" in final_state:
+                    new_messages = final_state["messages"][len(current_state["messages"]):]
+                    
+                    if new_messages:
+                        st.session_state.chat_history.extend(new_messages)
+                    else:
+                        st.toast("The graph did not return any new messages this time.", icon="🤔")
+                else:
+                    st.toast("The graph returned an invalid state.", icon="error")
+                    st.session_state.chat_history.append(AIMessage(content="Sorry, an internal error occurred in the graph state."))
+            
+            except Exception as e:
+                st.error(f"Error during graph execution: {e}")
+                st.session_state.chat_history.append(AIMessage(content=f"Sorry, an error occurred: {e}"))
+            
+            finally:
+                st.session_state["processing_lock"] = False
+                st.rerun()
+
+
+st.sidebar.divider()
+st.sidebar.title("Instructions")
+
+st.sidebar.markdown("""
+Type your question to the side to chat with the AI Agents.
+
+The Agents are able to query the CRM database to extract the answers.
+
+Types of questions:
+
+- **Which clients are active?**
+- **What interaction was made with João Silva?**
+- **Name one of the clients listed previously.**
+- **Which clients interacted via email?**
+- **Was any client a lead captured through interaction via website form?**
+- **What interactions occurred on April 29, 2025?**
+
+Generative AI makes mistakes. **ALWAYS** use your knowledge to verify the answers.
+""")
+
+# Support button in the sidebar that displays a message when clicked
+if st.sidebar.button("Support"):
+    st.sidebar.write("Questions? Send me an email: krupck@outlook.com")
+
+
