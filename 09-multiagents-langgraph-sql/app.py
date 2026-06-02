@@ -13,10 +13,9 @@ from langgraph.prebuilt import ToolNode
 from langchain.tools import tool
 
 DB_FILE = "crm_database.db" 
-st.set_page_config(page_title="Data Science Academy", page_icon=":100:", layout="wide")
+st.set_page_config(page_title="CRM AI - Henrique Krupck", page_icon=":100:", layout="wide")
 
-st.title("Data Science Academy - Projeto 7")
-st.title("🤖 Gerenciamento de Memória e Contexto - Sistema Multi-Agentes de IA com LangGraph Para Automação do CRM e Consulta a Banco de Dados")
+st.title("🤖 Memory and Context Management - Multi-Agent AI System with LangGraph for CRM Automation and Database Querying")
 
 load_dotenv()
 
@@ -289,7 +288,8 @@ if "app" not in st.session_state:
         st.session_state.thread_id = "streamlit_thread_crm"
         
         # If the chat history does not exist in the session, it initializes with a welcome message.
-        st.session_state.chat_history = [AIMessage(content="Hello! I'm your CRM assistant. Ask me about clients or interactions (e.g., 'Which clients are active?', 'Show oão Smith's interactions').")]
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = [AIMessage(content="Hello! I'm your CRM assistant. Ask me about clients or interactions (e.g., 'Which clients are active?', 'Show oão Smith's interactions').")]
         
         # Displays a success message after initializing the graph.
         st.success("CRM graph initialized.")
@@ -409,21 +409,22 @@ with container_chat:
         with st.chat_message(message_role_for_streamlit, avatar=avatar_icon):
             if role == "tool":
                 tool_name = getattr(msg, 'name', 'query_crm_database')
-                print(f"**Tool result ({tool_name})**:")
-                print(f"{msg.content}")
-                print(f"Call ID: {msg.tool_call_id}")
+                st.markdown(f"**Tool result ({tool_name})**:")
+                st.code(f"{msg.content}")
+                st.caption(f"Call ID: {msg.tool_call_id}")
                 
             # If the message is from AI, it displays the content and calls to the Tool if available.
             elif role == "ai":
-                print(f"**{sender_name}:**")
+                st.markdown(f"**{sender_name}:**")
                 if getattr(msg, 'tool_calls', None):
-                        print(f"*Calling Tool(s):*")
-                        print([{'name': tc.get('name', 'N/A'), 'args': tc.get('args', {})} for tc in msg.tool_calls])
-                print(msg.content)
+                        st.write(f"*Calling Tool(s):*")
+                        st.json([{'name': tc.get('name', 'N/A'), 'args': tc.get('args', {})} for tc in msg.tool_calls])
+
+                st.markdown(msg.content)
                 
             # If it's a message from the User, it displays the text directly.
             else:
-                print(msg.content)
+                st.markdown(msg.content)
 
 
 if prompt := st.chat_input("Ask a question about CRM..."):    
