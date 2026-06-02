@@ -150,3 +150,44 @@ def groq_agent_node(state: AgentState):
         print(f"An error occurred while conecting the Groq API: {e}")
         error_msg = AIMessage(content = f"[GROQ INTERNAL ERROR]: It was not possible to process with Groq. Detail: {e}", name = "ErrorGroq")
         return {"messages": [error_msg]}
+    
+
+# Defines the function of the OpenAI agent node responsible for interacting with the CRM.
+def openai_agent_node(state: AgentState):
+    print("\n--- Running the OpenAI Node (CRM) ---")
+    try:
+        llm_openai = ChatOpenAI(temperature=0.2, openai_api_key=openai_api_key, model_name="gpt-3.5-turbo")
+        
+        system_prompt = """You are an experienced CRM assistant called OpenAI (GPT model).
+            Your goal is to assist the user with information from the CRM database.
+            Use the 'query_crm_database' tool to execute SQL SELECT queries and retrieve data about customers or interactions.
+            Refer to the tool's description to understand the database schema (tables: tb_clients, tb_interactions; relevant columns such as name, email, status, interaction_date, type, notes).
+            Formulate precise SQL SELECT queries based on the user's question.
+            Present the results clearly. If you encounter a tool error, report it.
+            If the information is not available, indicate this clearly.
+        """
+        
+        agent_runnable = create_runnable_agent(llm_openai, system_prompt)
+        print("Runnable OpenAI (CRM) created. Invoking...")
+        response = agent_runnable.invoke({"messages": state['messages']})
+        print(f"Node OpenAI (CRM) Retrieved Response: Type={type(response)}, Content='{response.content[:50]}...'")
+
+        if hasattr(response, 'tool_calls') and response.tool_calls:
+            print(f"Node OpenAI (CRM) is calling the tool: {response.tool_calls}")
+
+        return {"messages": [response]}
+
+    except Exception as e:
+        print(f"!!! OpenAI Node Error (CRM): {e} !!!")
+        print(f"An error occurred while conecting the OpenAI API: {e}")
+        error_msg = AIMessage(content=f"[GROQ INTERNAL ERROR]: It was not possible to process with OpenAI. Detail: {e}", name="ErrorOpenAI")
+        return {"messages": [error_msg]}
+    
+
+# Function for the routing node
+# The routing logic will be in the next function
+# Even though it doesn't have processing logic, it acts as an explicit routing node, making it clear in the graph where the central decision occurs
+# In agent flow graphs, it's good practice to have explicit nodes that act as hubs or routers, even if they don't modify the state
+def route_junction_node(state: AgentState) -> dict:
+    print("--- Routing Junction Node (No State Change) ---")
+    return {}
