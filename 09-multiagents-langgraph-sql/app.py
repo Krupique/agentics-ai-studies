@@ -12,7 +12,7 @@ from langgraph.graph import StateGraph, END, START
 from langgraph.prebuilt import ToolNode
 from langchain.tools import tool
 
-DB_FILE = "dsa_crm_database.db" 
+DB_FILE = "crm_database.db" 
 st.set_page_config(page_title="Data Science Academy", page_icon=":100:", layout="wide")
 
 st.title("Data Science Academy - Projeto 7")
@@ -337,7 +337,7 @@ with st.sidebar.expander("📜 View Full Conversation History", expanded=False):
             # If the message is about a tool, adjust the sender's name to 'Tool'.
             elif role == "tool":
                 # Get the tool name or use the pattern.
-                tool_name = getattr(msg, 'name', 'dsa_query_crm_database')
+                tool_name = getattr(msg, 'name', 'query_crm_database')
                 sender_display = f"Ferramenta ({tool_name})"
             
             # Renders the sender header.
