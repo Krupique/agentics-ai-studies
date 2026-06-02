@@ -300,3 +300,61 @@ if "app" not in st.session_state:
         st.exception(e)
 
         st.stop()
+
+
+# Sidebar
+st.sidebar.title("Memory")
+with st.sidebar.expander("📜 View Full Conversation History", expanded=False):
+
+    if st.session_state.chat_history:
+        for i, msg in enumerate(st.session_state.chat_history):            
+            role = "ai" if isinstance(msg, AIMessage) else ("tool" if isinstance(msg, ToolMessage) else "user")
+            
+            sender_display = "User"            
+            if role == "ai":
+                # Count how many AI messages occurred before this one.
+                ai_message_index = sum(1 for m in st.session_state.chat_history[:i] if isinstance(m, AIMessage))
+                
+                # Check if there is explicit mention of the Groq router.
+                is_groq_explicit = "@groq" in msg.content.lower()
+                
+                # Check if there is explicit mention of the OpenAI router.
+                is_openai_explicit = "@openai" in msg.content.lower()
+                
+                # Gets the custom message name, if it exists.
+                msg_name = getattr(msg, 'name', None)
+                
+                # Defines the sender's display based on mention and toggle conditions
+                if is_groq_explicit or (not is_openai_explicit and ai_message_index % 2 == 0 and not msg_name):
+                    sender_display = "AI (Groq/Llama3)"
+                elif is_openai_explicit or (not is_groq_explicit and ai_message_index % 2 != 0 and not msg_name):
+                    sender_display = "AI (OpenAI/GPT)"
+                elif msg_name:
+                    sender_display = f"AI ({msg_name})"
+                else:
+                    sender_display = "AI (Assistente)"
+            
+            # If the message is about a tool, adjust the sender's name to 'Tool'.
+            elif role == "tool":
+                # Get the tool name or use the pattern.
+                tool_name = getattr(msg, 'name', 'dsa_query_crm_database')
+                sender_display = f"Ferramenta ({tool_name})"
+            
+            # Renders the sender header.
+            st.markdown(f"**{sender_display}:**")
+            
+            # Displays the message content in a read-only text field.
+            st.text_area(label=f"msg_{i}", value=msg.content, height=100, disabled=True, label_visibility="collapsed")
+            
+            # If the message is from AI and contains tool calls, it is displayed in JSON format.
+            if isinstance(msg, AIMessage) and getattr(msg, 'tool_calls', None):
+                st.write("*Chamada(s) de Ferramenta:*")
+                st.json([{'name': tc.get('name', 'N/A'), 'args': tc.get('args', {})} for tc in msg.tool_calls])
+            
+            # If the message is from a tool and has a caller ID, display the caption with the ID.
+            if isinstance(msg, ToolMessage) and hasattr(msg, 'tool_call_id'):
+                st.caption(f"ID da Chamada: {msg.tool_call_id}")
+            
+            st.divider()    
+    else:
+        st.write("No messages in the history yet.")
