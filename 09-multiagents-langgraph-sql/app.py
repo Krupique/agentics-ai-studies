@@ -238,3 +238,37 @@ def router_logic(state: AgentState) -> str:
     else:
         print(f"Logical Decision: Routing to OpenAI (default/alternating)")
         return "openai_agent"
+    
+
+# Define the function responsible for compiling the agent's state and transition graph.
+def compile_graph():
+    workflow = StateGraph(AgentState)
+    workflow.add_node("openai_agent", openai_agent_node)
+    workflow.add_node("groq_agent", groq_agent_node)
+    workflow.add_node("tools", tool_node)
+    workflow.add_node("router", route_junction_node)
+
+    # Connecting the START entry point to the routing node
+    workflow.add_edge(START, "router")
+    
+    # Configuring conditional edges exiting the router based on routing logic.
+    workflow.add_conditional_edges(
+        "router",
+        router_logic,
+        {
+            "tools": "tools",
+            "groq_agent": "groq_agent",
+            "openai_agent": "openai_agent",
+            "__end__": END
+        },
+    )
+    
+    workflow.add_edge("openai_agent", "router")
+    workflow.add_edge("groq_agent", "router")
+    workflow.add_edge("tools", "router")
+
+    # Compiling the workflow into an executable application.
+    app = workflow.compile()
+
+    print("Graph compiled successfully!")
+    return app
