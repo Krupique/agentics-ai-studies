@@ -358,3 +358,69 @@ with st.sidebar.expander("📜 View Full Conversation History", expanded=False):
             st.divider()    
     else:
         st.write("No messages in the history yet.")
+
+
+st.markdown("### Active Chat")
+container_chat = st.container(height = 500)
+
+with container_chat:
+    for i, msg in enumerate(st.session_state.chat_history):
+        role = "ai" if isinstance(msg, AIMessage) else ("tool" if isinstance(msg, ToolMessage) else "user")
+        avatar_icon = "👤"
+        sender_name = "User"
+        message_role_for_streamlit = "user"
+
+        if role == "ai":
+            message_role_for_streamlit = "assistant"
+            
+            ai_message_index = sum(1 for m in st.session_state.chat_history[:i] if isinstance(m, AIMessage))
+            is_groq_explicit = "@groq" in msg.content.lower()
+            is_openai_explicit = "@openai" in msg.content.lower()
+            
+            msg_name = getattr(msg, 'name', None)
+            
+            # If it's a Groq or an alternating pattern with an even index and no name, set the Groq avatar.
+            if is_groq_explicit or (not is_openai_explicit and ai_message_index % 2 == 0 and not msg_name):
+                    avatar_icon = "🦙"
+                    sender_name = "Groq (Llama3)"
+            
+            # If it's OpenAI or an odd-indexed, nameless toggle, set the OpenAI avatar.
+            elif is_openai_explicit or (not is_groq_explicit and ai_message_index % 2 != 0 and not msg_name):
+                    avatar_icon = "🤔"
+                    sender_name = "OpenAI (GPT)"
+            
+            # If a custom name is included in the message, use the system avatar.
+            elif msg_name:
+                    avatar_icon = "⚠️"
+                    sender_name = f"System ({msg_name})"
+            
+            # Otherwise, it uses a generic assistant avatar.
+            else:
+                    avatar_icon = "🤖"
+                    sender_name = "Assistant"
+        
+        # If the message is from Tool, adjust role, avatar, and name.
+        elif role == "tool":
+                message_role_for_streamlit = "assistant"
+                avatar_icon = "🛠️"
+                sender_name = "Tool"
+
+
+        with st.chat_message(message_role_for_streamlit, avatar=avatar_icon):
+            if role == "tool":
+                tool_name = getattr(msg, 'name', 'query_crm_database')
+                print(f"**Tool result ({tool_name})**:")
+                print(f"{msg.content}")
+                print(f"Call ID: {msg.tool_call_id}")
+                
+            # If the message is from AI, it displays the content and calls to the Tool if available.
+            elif role == "ai":
+                print(f"**{sender_name}:**")
+                if getattr(msg, 'tool_calls', None):
+                        print(f"*Calling Tool(s):*")
+                        print([{'name': tc.get('name', 'N/A'), 'args': tc.get('args', {})} for tc in msg.tool_calls])
+                print(msg.content)
+                
+            # If it's a message from the User, it displays the text directly.
+            else:
+                print(msg.content)
