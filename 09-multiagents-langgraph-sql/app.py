@@ -191,3 +191,50 @@ def openai_agent_node(state: AgentState):
 def route_junction_node(state: AgentState) -> dict:
     print("--- Routing Junction Node (No State Change) ---")
     return {}
+
+
+# Define the function responsible for deciding where the router should send the next message
+def router_logic(state: AgentState) -> str:
+    print("\n--- Routing Logic Function (Deciding Next Step) ---")
+    messages = state['messages']
+    last_message = messages[-1] if messages else None
+
+    if not last_message:
+        print("Logical Decision: No messages in the state, ending.")
+        return "__end__"
+
+    print(f"Router analyzing last message: Type={type(last_message).__name__}, Content='{last_message.content[:80]}...'")
+
+    if isinstance(last_message, AIMessage) and hasattr(last_message, 'tool_calls') and last_message.tool_calls:
+        print("Logical Decision: Last AI message has 'tool_calls'. Routing to Tools.")
+        return "tools"
+
+    if isinstance(last_message, AIMessage):
+        print("Logical Decision: Final AI response received (without tool_calls). Ending the current loop.")
+        return "__end__"
+
+    if isinstance(last_message, HumanMessage):
+        user_input_current = last_message.content.lower()
+        print(f"Analyzing last human message for mentions: '{user_input_current}'")
+
+        if "@openai" in user_input_current:
+            print("Logical Decision: Routing to OpenAI (explicit mention in the last message)")
+            return "openai_agent"
+
+        elif "@groq" in user_input_current:
+            print("Logical Decision: Routing to Groq (explicit mention in the last message)")
+            return "groq_agent"
+
+    if isinstance(last_message, ToolMessage):
+        print("Logical Decision: Tool result received, routing to an agent (via alternation)...")
+
+    ai_message_count = sum(1 for msg in messages if isinstance(msg, AIMessage))
+    print(f"Current AI message count for alternation: {ai_message_count}")
+
+    if ai_message_count % 2 == 0:
+        print(f"Logical Decision: Routing to Groq (default/alternating)")
+        return "groq_agent"
+
+    else:
+        print(f"Logical Decision: Routing to OpenAI (default/alternating)")
+        return "openai_agent"
