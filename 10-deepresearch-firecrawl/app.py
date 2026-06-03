@@ -127,3 +127,32 @@ elaboration_agent = Agent(
         5. Ensuring that all additions are relevant and valuable to the topic
     """
 )
+
+# Main function that orchestrates the flow of research and development.
+async def run_research_process(topic: str):
+    
+    # Loading indicator for initial search.
+    with st.spinner("Conduzindo a pesquisa inicial..."):
+        research_result = await Runner.run(research_agent, topic)
+        initial_report = research_result.final_output
+    
+    # Expandable to display the initial report to the user.
+    with st.expander("Visualizar o Relatório da Pesquisa"):
+        st.markdown(initial_report)
+    
+    # Loading indicator during the report enhancement phase.
+    with st.spinner("Improving the report with additional information..."):
+        
+        elaboration_input = f"""
+        RESEARCH TOPIC: {topic}
+        
+        INITIAL RESEARCH REPORT:
+        {initial_report}
+        
+        Supplement this research report with additional information, examples, case studies, and more in-depth insights, while maintaining its academic rigor and factual accuracy..
+        """
+        
+        elaboration_result = await Runner.run(elaboration_agent, elaboration_input)
+        enhanced_report = elaboration_result.final_output
+    
+    return enhanced_report
