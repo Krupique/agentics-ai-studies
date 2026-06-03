@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from typing import Dict, Any, List
 from agents import Agent, Runner, trace
 from agents import set_default_openai_key
-from firecrawl import FirecrawlApp
+from firecrawl import Firecrawl
 from agents.tool import function_tool
 
 load_dotenv()
@@ -50,32 +50,31 @@ research_topic = st.text_input("Enter the Topic to Search:", placeholder = "For 
 @function_tool
 async def deep_research(query: str, max_depth: int, time_limit: int, max_urls: int) -> Dict[str, Any]:
     try:
-        firecrawl_app = FirecrawlApp(api_key = st.session_state.firecrawl_api_key)
-        # Parameters for in-depth research
-        params = {
-            "maxDepth": max_depth,
-            "timeLimit": time_limit,
-            "maxUrls": max_urls
-        }
-        
-        # Callback function to display progress activities in the interface.
-        def on_activity(activity):
-            st.write(f"[{activity['type']}] {activity['message']}")
-        
+        firecrawl_app = Firecrawl(api_key = st.session_state.firecrawl_api_key)
         # Displays a loading indicator while the search is in progress.
         with st.spinner("Running deep research..."):
-            results = firecrawl_app.deep_research( # https://docs.firecrawl.dev/features/search?search=deep+research
+            response = firecrawl_app.search( # https://docs.firecrawl.dev/features/search?search=deep+research
                 query = query,
-                params = params,
-                on_activity = on_activity
+                limit = 5
             )
-        
+
+        results = ''
+        for item in response.web or []:
+            # Use dictionary key lookup safely
+            if isinstance(item, dict):
+                clean_markdown = item.get('markdown', '')
+                url = item.get('url', '')
+            else:
+                # Fallback just in case it's an object with attributes
+                clean_markdown = getattr(item, 'markdown', '')
+                url = getattr(item, 'url', '')
+            
+            results += clean_markdown
+            
         # Returns structured results with final analysis and sources found.
         return {
             "success": True,
-            "final_analysis": results['data']['finalAnalysis'],
-            "sources_count": len(results['data']['sources']),
-            "sources": results['data']['sources']
+            "final_analysis": results,
         }
 
     # Handles errors and displays error messages to the user.
@@ -156,6 +155,35 @@ async def run_research_process(topic: str):
         enhanced_report = elaboration_result.final_output
     
     return enhanced_report
+
+
+if st.button("Start Research", disabled = not (openai_api_key and firecrawl_api_key and research_topic)):
+    
+    if not openai_api_key or not firecrawl_api_key:
+        st.warning("Please enter both API keys in the sidebar.")
+    elif not research_topic:
+        st.warning("Please enter a research topic.")
+    else:
+        try:
+            # Placeholder for dynamically updating report content.
+            report_placeholder = st.empty()
+            
+            # Executes the search flow synchronously with Streamlit.
+            enhanced_report = asyncio.run(run_research_process(research_topic))
+            
+            # Displays the enhanced report and provides a download button.
+            report_placeholder.markdown("## Enhanced Research Report")
+            report_placeholder.markdown(enhanced_report)
+            
+            st.download_button(
+                "Download the Report",
+                enhanced_report,
+                file_name=f"{research_topic.replace(' ', '_')}_report.md",
+                mime="text/markdown"
+            )
+            
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
 
 
 st.markdown("---")
