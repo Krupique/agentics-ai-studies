@@ -41,3 +41,67 @@ with st.sidebar:
     
     if firecrawl_api_key:
         st.session_state.firecrawl_api_key = firecrawl_api_key
+
+st.title("📘 AI Agents for Deep Research with OpenAI Agents SDK and Firecrawl")
+
+research_topic = st.text_input("Enter the Topic to Search:", placeholder = "For example: What is Hi-Fi audio and what devices should be used?")
+
+
+@function_tool
+async def deep_research(query: str, max_depth: int, time_limit: int, max_urls: int) -> Dict[str, Any]:
+    try:
+        firecrawl_app = FirecrawlApp(api_key = st.session_state.firecrawl_api_key)
+        # Parameters for in-depth research
+        params = {
+            "maxDepth": max_depth,
+            "timeLimit": time_limit,
+            "maxUrls": max_urls
+        }
+        
+        # Callback function to display progress activities in the interface.
+        def on_activity(activity):
+            st.write(f"[{activity['type']}] {activity['message']}")
+        
+        # Displays a loading indicator while the search is in progress.
+        with st.spinner("Running deep research..."):
+            results = firecrawl_app.deep_research( # https://docs.firecrawl.dev/features/search?search=deep+research
+                query = query,
+                params = params,
+                on_activity = on_activity
+            )
+        
+        # Returns structured results with final analysis and sources found.
+        return {
+            "success": True,
+            "final_analysis": results['data']['finalAnalysis'],
+            "sources_count": len(results['data']['sources']),
+            "sources": results['data']['sources']
+        }
+
+    # Handles errors and displays error messages to the user.
+    except Exception as e:
+        st.error(f"Deep research error: {str(e)}")
+        return {"error": str(e), "success": False}
+    
+
+# Configuration of the agent responsible for the initial search.
+research_agent = Agent(
+    name = "research_agent",
+    instructions = """You are a research assistant who can conduct web research on any topic.
+        When presented with a research topic or question:
+
+        1. Use the deep_research tool to gather comprehensive information.
+
+        Always use these parameters:
+
+        * max_depth: 3 (for moderate depth)
+        * time_limit: 180 (3 minutes)
+        * max_urls: 5 (sufficient sources)
+
+        2. The tool will search the web, analyze various sources, and provide a summary.
+        3. Review the research results and organize them into a well-structured report.
+        4. Include appropriate citations for all sources.
+        5. Highlight key findings and insights.
+    """,
+    tools = [deep_research]
+)
