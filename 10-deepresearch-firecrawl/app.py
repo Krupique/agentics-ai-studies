@@ -156,3 +156,19 @@ async def run_research_process(topic: str):
         enhanced_report = elaboration_result.final_output
     
     return enhanced_report
+
+
+st.markdown("---")
+
+st.markdown("Produced with OpenAI Agents SDK and Firecrawl.")
+
+st.sidebar.divider()
+st.sidebar.title("Instructions")
+
+st.sidebar.markdown("""
+Type the desired research topic in the box to the side.
+
+**The free version of Firecrawl has limitations.**
+
+Generative AI makes mistakes. **ALWAYS** use your knowledge to verify the answers.
+""")
