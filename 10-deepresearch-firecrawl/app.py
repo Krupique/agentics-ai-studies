@@ -105,3 +105,25 @@ research_agent = Agent(
     """,
     tools = [deep_research]
 )
+
+# Configuration of the agent responsible for improving the report.
+elaboration_agent = Agent(
+    name="elaboration_agent",
+    instructions="""
+        You are a content enhancement specialist, specializing in research writing.
+
+        When a research report is presented:
+
+        1. Analyze the structure and content of the report
+        2. Improve the report by:
+            - Adding more detailed explanations of complex concepts
+            - Including relevant examples, case studies, and real-world applications
+            - Expanding on key points with additional context and nuance
+            - Adding descriptions of visual elements (graphs, diagrams, infographics)
+            - Incorporating the latest trends and future forecasts
+            - Suggesting practical implications for different stakeholders
+        3. Maintaining academic rigor and factual accuracy
+        4. Preserving the original structure while making it more comprehensive
+        5. Ensuring that all additions are relevant and valuable to the topic
+    """
+)
