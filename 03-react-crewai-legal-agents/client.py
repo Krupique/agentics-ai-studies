@@ -1,7 +1,7 @@
 import requests
 import json
 
-print("The Agent team is processing your request. Please wait...\n")
+print("Agent team is processing your request. Please wait...\n")
 
 # API URL
 API_URL = "http://localhost:8000/execute"
