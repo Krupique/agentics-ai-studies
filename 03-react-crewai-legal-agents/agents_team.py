@@ -56,7 +56,7 @@ llm_reporter = LLM(model="gpt-4o", temperature=0.5)
 researcher = Agent(
     role='Senior Researcher Analyst',
     goal='Do complete searches and collect relevant data',
-    backstory="""Você é um analista de pesquisa sênior com 15 anos de experiência em análise de dados. 
+    backstory=""" 
     You are a senior researcher analyst with fifteen years of experience in data analysis and market reasearch. 
     You have a postgraduation in Data Science and you are a specialist in recognize patterns and trend analysis. 
     You are great in:
@@ -134,9 +134,7 @@ def execute_agents_team(topic):
         ]
 
         # Create the Agent Team (Crew)
-        legal_team = Crew(agents=[researcher, legal_assistent, reporter],
-                             tasks=tasks,
-                             verbose=True)
+        legal_team = Crew(agents=[researcher, legal_assistent, reporter], tasks=tasks, verbose=True)
 
         print("\nStarting the agent team execution...\n")
         # Initialize the execution and saving the result
