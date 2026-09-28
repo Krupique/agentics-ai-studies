@@ -9,7 +9,7 @@ class TopicRequest(BaseModel):
     topic: str
 
 @app.post("/execute")
-def dsa_executa_agentes(request: TopicRequest):
+def execute_agents(request: TopicRequest):
     resultado = execute_agents_team(request.topic)
     return {"result": resultado}
 
