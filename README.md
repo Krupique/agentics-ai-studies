@@ -3,6 +3,8 @@ This is a repository to compile my Agentic AI studies
 
 ---
 ## 1st Project: ReAct for Financial Market Analysis (GROQ api)
+> 📖 **[View Dedicated Project Showcase & Recruiter Documentation](01-react-financial-market-analysis/README.md)**
+
 ReAct (Reasoning + Action): It's a core paradigm in AI Agent design that combines the generated text from an LLM with external tools, such as searches, apis, sql databases, and so on.<br/>
 1. The aim of this project is building an Agent that get stocks data from yFinance API, news about a specific company using DuckDuckGo and combining LLMs to analyse the data.<br/>
 2. It's the simpler project that uses Agents. I just get the API key from GROQ and I'm using the class Agent from the phi package to coordinate al this operation.<br/>
